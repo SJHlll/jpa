@@ -26,6 +26,9 @@ public class Post {
     @Column(nullable = false)
     private String writer;
 
+    @Column(nullable = false)
+    private String title;
+
     private String content;
 
     @CreationTimestamp
