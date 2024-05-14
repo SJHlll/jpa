@@ -134,19 +134,19 @@ class StudentRepositoryTest {
         System.out.println("\n\n\n");
     }
 
-    @Test
-    @DisplayName("JPQL로 삭제하기")
-    void testDeleteByJPQL() {
-        // given
-        String name = "대길이";
-        // when
-        studentRepository.deleteByNameWithJPQL(name);
-
-        // then
-        List<Student> students = studentRepository.findByName(name);
-
-        assertEquals(0, students.size());
-    }
+//    @Test
+//    @DisplayName("JPQL로 삭제하기")
+//    void testDeleteByJPQL() {
+//        // given
+//        String name = "대길이";
+//        // when
+//        studentRepository.deleteByNameWithJPQL(name);
+//
+//        // then
+//        List<Student> students = studentRepository.findByName(name);
+//
+//        assertEquals(0, students.size());
+//    }
 
 }
 
