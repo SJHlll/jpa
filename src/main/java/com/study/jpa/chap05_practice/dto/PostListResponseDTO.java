@@ -14,6 +14,6 @@ public class PostListResponseDTO {
 
     private int count;
     private List<PostDetailResponseDTO> posts; // 게시물 렌더링 정보
-    private pageResponseDTO pageInfo; // 페이지 렌더링 정보
+    private PageResponseDTO pageInfo; // 페이지 렌더링 정보
 
 }

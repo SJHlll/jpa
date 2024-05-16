@@ -20,13 +20,13 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional // JPA 레퍼지토리는 트랜잭션 단위로 동작하기 때문에 작성
+@Transactional // JPA 레파지토리는 트랜잭션 단위로 동작하기 때문에 작성해 주세요.
 public class PostService {
 
     private final PostRepository postRepository;
     private final HashTagRepository hashTagRepository;
 
-    public PostListResponseDTO getPosts(pageDTO dto) {
+    public PostListResponseDTO getPosts(PageDTO dto) {
 
         // Pageable 객체 생성
         Pageable pageable = PageRequest.of(
@@ -41,31 +41,39 @@ public class PostService {
         // 게시물 정보만 꺼내기
         List<Post> postList = posts.getContent();
 
-        // 게시글 정보를 응답용 DTO의 형태에 맞게 변환
-        List<PostDetailResponseDTO> detailList = postList.stream()
+        // 게시물 정보를 응답용 DTO의 형태에 맞게 변환
+        List<PostDetailResponseDTO> detailList
+                = postList.stream()
                 .map(PostDetailResponseDTO::new)
                 .collect(Collectors.toList());
 
-        // DB에서 조회한 정보를 JSON 형태에 맞는 DTO로 변환
-        // 페이지 구성 정보와 위에 있는 게시물 정보를 또다른 DTO로 한번에 포장해서 리턴할 예정
+        // DB에서 조회한 정보를 JSON 형태에 맞는 DTO로 변환.
+        // 페이지 구성 정보와 위에 있는 게시물 정보를 또다른 DTO로 한번에 포장해서 리턴할 예정.
         // -> PostListResponseDTO
 
         return PostListResponseDTO.builder()
-                .count(detailList.size()) // 총 게시물 수가 아닌 조회된 게시물의 개수
-                .pageInfo(new pageResponseDTO(posts)) // JPA가 준 페이지 정보가 담긴 객체를 DTO에게 전달해서 그쪽에서 알고리즘 돌리게 시킴
+                // 총 게시물의 수가 아니라 페이징에 의해 조회된 게시물의 개수
+                .count(detailList.size())
+                // JPA가 준 페이지 정보가 담긴 객체를 DTO에게 전달해서 그쪽에서 알고리즘 돌리게 시킴.
+                .pageInfo(new PageResponseDTO(posts))
                 .posts(detailList)
                 .build();
+
     }
 
     public PostDetailResponseDTO getDetail(Long id) throws Exception {
 
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(id + "번 게시물이 존재하지 않습니다."));
-
+        Post post = getPost(id);
         return new PostDetailResponseDTO(post);
     }
 
-    public PostDetailResponseDTO insert(PostCreateDTO dto) {
+    private Post getPost(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(id + "번 게시물이 존재하지 않습니다."));
+        return post;
+    }
+
+    public PostDetailResponseDTO insert(PostCreateDTO dto) throws Exception {
 
         // 게시물 저장 (아직 해시태그는 insert 되지 않음)
         Post saved = postRepository.save(dto.toEntity());
@@ -96,23 +104,31 @@ public class PostService {
             });
         }
 
-        // 방금 insert 요청한 게시물 정보를 DTO로 변환해서 리턴
+
+        // 방금 insert 요청한 게시물 정보를 DTO로 변환해서 리턴.
         return new PostDetailResponseDTO(saved);
 
     }
+
+    public PostDetailResponseDTO modify(PostModifyDTO dto) {
+
+        // 수정 전 데이터를 조회
+        Post postEntity = getPost(dto.getPostNo());
+
+        // 수정 시작
+        postEntity.setTitle(dto.getTitle());
+        postEntity.setContent(dto.getContent());
+
+        // 수정 완료
+        Post modifiedPost = postRepository.save(postEntity);
+
+        return new PostDetailResponseDTO(modifiedPost);
+
+    }
+
+    public void delete(Long id) {
+
+        postRepository.deleteById(id);
+
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

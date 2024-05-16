@@ -3,8 +3,7 @@ package com.study.jpa.chap05_practice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Setter
-@Getter
+@Setter @Getter
 @ToString(exclude = {"post"})
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
@@ -19,9 +18,9 @@ public class HashTag {
     @Column(name = "tag_no")
     private Long id;
 
-    private String tagName;
+    private String tagName; // 해시태그 이름
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "post_no")
     private Post post;
 
